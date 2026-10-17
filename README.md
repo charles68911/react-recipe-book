@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Recipe Book Frontend
 
 Empty React + Vite + Tailwind CSS starter for VS Code.
@@ -22,3 +23,6 @@ npm run build
 ```
 
 This is intentionally an empty scaffold. It does not yet include recipe pages, authentication, API services, routing, or backend integration. Refer to your instructor's documentation when implementing those features.
+=======
+# react-recipe-book
+>>>>>>> ac04f35db9c8885fe30e70bc8cca0c4d80a14d01
