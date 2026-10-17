@@ -5,15 +5,35 @@ import { LoginForm } from "@/components/features/auth/login-form";
 
 export default function LoginPage() {
   return (
-    <Card className="rounded-2xl border-emerald-100/40 bg-[#eef3e8] p-6 shadow-2xl shadow-black/20 sm:p-8 [&_input]:border-emerald-900/15 [&_input]:bg-white/60 [&_input]:py-3 [&_input]:outline-none [&_input]:focus:border-emerald-700 [&_input]:focus:ring-2 [&_input]:focus:ring-emerald-700/15">
-      {/* The page owns its presentation; the feature handles form state and submission. */}
-      <AuthFormHeader title="Welcome back" description="Sign in to find your next favorite meal." />
+<Card
+  className="
+  mx-auto
+  w-full
+  max-w-md
+  rounded-[30px]
+  bg-white/90
+  border border-white/20
+  backdrop-blur-xl
+  p-10
+  shadow-[0_30px_80px_rgba(0,0,0,.22)]
+"
+>
+      <AuthFormHeader
+        title="Welcome Back"
+        description="Sign in to continue managing your favorite recipes."
+      />
 
       <LoginForm />
 
-      <Link className="mt-6 block text-center text-sm text-emerald-900 underline underline-offset-4" to={"/auth/signup"}>
-        New here? Create an account
-      </Link>
+      <p className="mt-8 text-center text-sm text-slate-500">
+        Don't have an account?{" "}
+        <Link
+          to="/auth/signup"
+          className="font-semibold text-emerald-700 hover:text-emerald-800"
+        >
+          Create one
+        </Link>
+      </p>
     </Card>
   );
 }
