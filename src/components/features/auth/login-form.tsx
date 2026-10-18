@@ -1,72 +1,48 @@
 import { useNavigate } from "react-router";
 import { useState, type SubmitEvent } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-
+import { useAuth } from "@/components/context/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 function getErrorMessage(error: unknown) {
   if (typeof error === "object" && error !== null && "response" in error) {
-    const response = (
-      error as {
-        response?: {
-          data?: {
-            message?: string;
-          };
-        };
-      }
-    ).response;
-
-    if (response?.data?.message) {
-      return response.data.message;
-    }
+    const response = (error as { response?: { data?: { message?: string } } }).response;
+    if (response?.data?.message) return response.data.message;
   }
-
-  return "Could not connect to the API.";
+  return "Could not connect to the API. Check that the API server is running.";
 }
 
 export function LoginForm() {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  // Keep field values in React state; the auth context calls the API service.
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setError("");
     setBusy(true);
-
-    const isAdmin =
-      email.trim().toLowerCase() === "admin@example.com";
-
-    const demoUser = {
-      id: isAdmin ? "demo-admin" : "demo-user",
-      name: isAdmin ? "Demo Admin" : "Demo User",
-      email: email.trim(),
-      role: isAdmin ? "ADMIN" : "USER",
-    };
-
-    sessionStorage.setItem("demoUser", JSON.stringify(demoUser));
-
-    navigate(isAdmin ? "/admin" : "/user", {
-      replace: true,
-    });
-
-    setBusy(false);
+    try {
+      const currentUser = await login(email, password);
+      // Navigate after the context has received the authenticated user.
+      const destination = currentUser.role === "ADMIN" ? "/admin" : "/user";
+      navigate(destination, { replace: true });
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mt-8 space-y-7"
-    >
+    <form onSubmit={handleSubmit} className="mt-8 space-y-7">
       {/* EMAIL */}
 
       <div className="space-y-2">
@@ -81,15 +57,7 @@ export function LoginForm() {
           <Mail
             size={18}
             strokeWidth={2}
-            className="
-              absolute
-              left-4
-              top-1/2
-              -translate-y-1/2
-              text-slate-400
-              transition-colors
-              group-focus-within:text-emerald-600
-            "
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-emerald-600"
           />
 
           <Input
@@ -100,12 +68,7 @@ export function LoginForm() {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="
-              pl-11
-              h-14
-              rounded-2xl
-              transition-all
-            "
+            className="h-14 pl-11"
           />
         </div>
       </div>
@@ -113,41 +76,18 @@ export function LoginForm() {
       {/* PASSWORD */}
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label
-            htmlFor="auth-password"
-            className="text-sm font-semibold tracking-wide text-slate-700"
-          >
-            Password
-          </Label>
-
-          <button
-            type="button"
-            className="
-              text-sm
-              font-medium
-              text-emerald-700
-              transition-colors
-              hover:text-emerald-900
-            "
-          >
-            Forgot Password?
-          </button>
-        </div>
+        <Label
+          htmlFor="auth-password"
+          className="text-sm font-semibold tracking-wide text-slate-700"
+        >
+          Password
+        </Label>
 
         <div className="group relative">
           <Lock
             size={18}
             strokeWidth={2}
-            className="
-              absolute
-              left-4
-              top-1/2
-              -translate-y-1/2
-              text-slate-400
-              transition-colors
-              group-focus-within:text-emerald-600
-            "
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-emerald-600"
           />
 
           <Input
@@ -159,35 +99,19 @@ export function LoginForm() {
             minLength={1}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="
-              pl-11
-              pr-12
-              h-14
-              rounded-2xl
-              transition-all
-            "
+            className="h-14 pl-11 pr-12"
           />
 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="
-              absolute
-              right-4
-              top-1/2
-              -translate-y-1/2
-              rounded-full
-              p-1
-              text-slate-400
-              transition-all
-              hover:bg-slate-100
-              hover:text-emerald-700
-            "
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-emerald-700"
           >
             {showPassword ? (
-              <EyeOff size={18} />
+              <EyeOff size={18} aria-hidden />
             ) : (
-              <Eye size={18} />
+              <Eye size={18} aria-hidden />
             )}
           </button>
         </div>
@@ -198,17 +122,7 @@ export function LoginForm() {
       {error && (
         <div
           role="alert"
-          className="
-            rounded-2xl
-            border
-            border-red-200
-            bg-red-50
-            px-4
-            py-3
-            text-sm
-            font-medium
-            text-red-600
-          "
+          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600"
         >
           {error}
         </div>
@@ -219,28 +133,10 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={busy}
-        className="
-          h-14
-          w-full
-          rounded-2xl
-          bg-gradient-to-r
-          from-emerald-600
-          to-emerald-700
-          text-white
-          font-semibold
-          tracking-wide
-          shadow-lg
-          transition-all
-          duration-300
-          hover:-translate-y-1
-          hover:shadow-2xl
-          hover:from-emerald-700
-          hover:to-emerald-800
-          active:scale-[0.98]
-        "
+        className="h-14 w-full rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold tracking-wide shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-emerald-700 hover:to-emerald-800 hover:shadow-2xl active:scale-[0.98]"
       >
         {busy ? "Signing in..." : "Continue"}
-      </Button> 
+      </Button>
     </form>
   );
 }

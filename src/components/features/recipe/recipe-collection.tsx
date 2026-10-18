@@ -16,6 +16,7 @@ import {
 } from "@/services/recipe-service";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import RecipeCard from "@/components/features/recipe/recipe-card";
 import AddRecipeForm from "@/components/features/recipe/add-recipe-form";
 import { Navigate } from "react-router";
@@ -129,6 +130,7 @@ export function RecipeCollection() {
     setOpen(false);
   }
 
+  // Add the saved recipe to local state so the list updates immediately.
   function handleCreated(recipe: Recipe) {
     setRecipes((current) => [recipe, ...current]);
     closeForm();
@@ -148,6 +150,7 @@ export function RecipeCollection() {
   const noMatches = hasRecipes && visibleRecipes.length === 0;
   const isFiltering = query.trim() !== "" || difficulty !== "All";
 
+  // The page supplies the header; this feature owns the collection and its dialog.
   return (
     <>
       {/* Header + stats */}
@@ -208,35 +211,38 @@ export function RecipeCollection() {
             <p>{error}</p>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={() => setReloadKey((key) => key + 1)}
-            className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:self-auto"
+            className="inline-flex self-start items-center justify-center gap-2 rounded-xl border-transparent bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline-red-600 sm:self-auto"
           >
             <RotateCw size={16} aria-hidden />
             Try again
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Search + difficulty filter, styled like the login inputs */}
       {hasRecipes && (
         <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <label className="relative block flex-1">
-            <span className="sr-only">Search recipes</span>
+          <div className="relative flex-1">
+            <label htmlFor="recipe-search" className="sr-only">
+              Search recipes
+            </label>
             <Search
               size={20}
               aria-hidden
               className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
             />
-            <input
+            <Input
+              id="recipe-search"
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search by name, cuisine or tag"
-              className="h-14 w-full rounded-2xl border border-white bg-white pl-12 pr-4 text-slate-900 shadow-lg shadow-black/10 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400"
+              className="h-14 border-white bg-white pl-12 shadow-lg shadow-black/10 focus:ring-2 focus:ring-emerald-400"
             />
-          </label>
+          </div>
 
           <div
             role="group"
@@ -247,19 +253,19 @@ export function RecipeCollection() {
               const selected = difficulty === level;
 
               return (
-                <button
+                <Button
                   key={level}
-                  type="button"
+                  variant={selected ? "primary" : "secondary"}
                   aria-pressed={selected}
                   onClick={() => setDifficulty(level)}
                   className={
                     selected
-                      ? "h-14 shrink-0 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-5 font-semibold text-white shadow-lg shadow-emerald-950/30 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-                      : "h-14 shrink-0 rounded-2xl bg-white px-5 font-medium text-slate-600 shadow-lg shadow-black/10 transition hover:text-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+                      ? "inline-flex h-14 shrink-0 items-center justify-center gap-2 border-transparent bg-gradient-to-r from-emerald-600 to-emerald-700 px-5 font-semibold text-white shadow-lg shadow-emerald-950/30 focus-visible:outline-emerald-300"
+                      : "inline-flex h-14 shrink-0 items-center justify-center gap-2 border-transparent bg-white px-5 font-medium text-slate-600 shadow-lg shadow-black/10 hover:text-emerald-700 focus-visible:outline-emerald-300"
                   }
                 >
                   {level}
-                </button>
+                </Button>
               );
             })}
           </div>

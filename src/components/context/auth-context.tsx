@@ -11,34 +11,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // useCallback keeps the same function between renders.
   // The service handles API requests; this provider stores the returned user.
-  // const login = useCallback(async (email: string, password: string) => {
-  //   const currentUser = await loginService(email, password);
-  //   setUser(currentUser);
-  //   setReady(true);
-  //   // The login page uses this user's role to choose its next URL.
-  //   return currentUser;
-  // }, []);
-
   const login = useCallback(async (email: string, password: string) => {
-  // Temporary demo login without a backend
-  const isAdmin =
-    email.trim().toLowerCase() === "admin@example.com";
-
-  const currentUser: User = {
-    id: isAdmin ? "demo-admin" : "demo-user",
-    name: isAdmin ? "Demo Admin" : "Demo User",
-    email: email.trim(),
-    role: isAdmin ? "ADMIN" : "USER",
-  };
-
-  setUser(currentUser);
-  setReady(true);
-
-  // Save the demo session for page refreshes
-  sessionStorage.setItem("demoUser", JSON.stringify(currentUser));
-
-  return currentUser;
-}, []);
+    const currentUser = await loginService(email, password);
+    setUser(currentUser);
+    setReady(true);
+    // The login page uses this user's role to choose its next URL.
+    return currentUser;
+  }, []);
 
   // The signup service creates the account and signs it in.
   const signup = useCallback(async (name: string, email: string, password: string) => {
@@ -49,10 +28,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Ask the API to clear its cookies and revoke the refresh token first.
-const logout = useCallback(async () => {
-  sessionStorage.removeItem("demoUser");
-  setUser(null);
-}, []);
+  const logout = useCallback(async () => {
+    await logoutService();
+    setUser(null);
+  }, []);
+
   // Check for an existing cookie session when the provider first appears.
   useEffect(() => {
     // A request may finish after this provider is removed from the page.
@@ -65,25 +45,25 @@ const logout = useCallback(async () => {
 
     window.addEventListener("auth:expired", onExpired);
 
-   async function restoreSession() {
-  try {
-    const savedUser = sessionStorage.getItem("demoUser");
-
-    if (savedUser && mounted) {
-      setUser(JSON.parse(savedUser) as User);
-    } else if (mounted) {
-      setUser(null);
+    async function restoreSession() {
+      try {
+        // The service refreshes the cookie tokens and fetches the current user.
+        const currentUser = await restoreSessionService();
+        if (mounted) {
+          setUser(currentUser);
+        }
+      } catch {
+        // If the session cannot be restored, treat the visitor as signed out.
+        if (mounted) {
+          setUser(null);
+        }
+      } finally {
+        // The check is complete whether it succeeded or failed.
+        if (mounted) {
+          setReady(true);
+        }
+      }
     }
-  } catch {
-    if (mounted) {
-      setUser(null);
-    }
-  } finally {
-    if (mounted) {
-      setReady(true);
-    }
-  }
-}
 
     restoreSession();
 
