@@ -350,7 +350,12 @@ export function AdminRecipes() {
         </div>
       )}
 
-      {!isFiltering && !loading && !error && <AdminRecipesTable recipes={visibleRecipes} loading={loading} />}
+      {/* The table stays mounted while filtering, so picking a level like Easy
+          narrows the list in place instead of replacing it. It only steps aside
+          when the filters match nothing, which the panel above already explains. */}
+      {!loading && !error && (visibleRecipes.length > 0 || !isFiltering) && (
+        <AdminRecipesTable recipes={visibleRecipes} loading={loading} />
+      )}
     </section>
   );
 }
