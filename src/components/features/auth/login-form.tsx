@@ -2,7 +2,8 @@ import { useNavigate } from "react-router";
 import { useState, type SubmitEvent } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
-import { useAuth } from "@/components/context/use-auth";
+// i comment this part to make it responsive even there's no backend
+// import { useAuth } from "@/components/context/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ function getErrorMessage(error: unknown) {
 }
 
 export function LoginForm() {
-  const { login } = useAuth();
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -39,24 +40,48 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
+  // async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  //   event.preventDefault();
 
-    setError("");
-    setBusy(true);
+  //   setError("");
+  //   setBusy(true);
 
-    try {
-      const currentUser = await login(email, password);
+  //   try {
+  //     const currentUser = await login(email, password);
 
-      navigate(currentUser.role === "ADMIN" ? "/admin" : "/user", {
-        replace: true,
-      });
-    } catch (requestError) {
-      setError(getErrorMessage(requestError));
-    } finally {
-      setBusy(false);
-    }
-  }
+  //     navigate(currentUser.role === "ADMIN" ? "/admin" : "/user", {
+  //       replace: true,
+  //     });
+  //   } catch (requestError) {
+  //     setError(getErrorMessage(requestError));
+  //   } finally {
+  //     setBusy(false);
+  //   }
+  // }
+
+function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  setError("");
+  setBusy(true);
+
+  // Temporary demo login without a backend
+  const isAdmin =
+    email.trim().toLowerCase() === "admin@example.com";
+
+  const demoUser = {
+    id: isAdmin ? "demo-admin" : "demo-user",
+    name: isAdmin ? "Demo Admin" : "Demo User",
+    email: email.trim(),
+    role: isAdmin ? "ADMIN" : "USER",
+  };
+
+  sessionStorage.setItem("demoUser", JSON.stringify(demoUser));
+
+  navigate(isAdmin ? "/admin" : "/user", { replace: true });
+
+  setBusy(false);
+}
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/components/context/use-auth";
 import { PageHeader } from "@/components/common/page-header";
 import { AdminRecipes } from "@/components/features/admin/admin-recipes";
@@ -22,12 +23,15 @@ export default function AdminPage() {
     <Section>
       <PageHeader eyebrow="Recipe Book · Administration" title="All recipes" description="Browse recipes across every account.">
         <div className="flex flex-wrap items-center gap-4">
-          <span>{user?.name}</span>
-          <Button variant="secondary" onClick={handleLogout}>Sign out</Button>
+          <span className="text-sm text-emerald-100/80">{user?.name}</span>
+          <Button variant="secondary" onClick={handleLogout} className="inline-flex items-center gap-1.5 rounded-full">
+            <LogOut size={15} />
+            Sign out
+          </Button>
         </div>
       </PageHeader>
 
-      {error && <p role="alert" className="mb-6 text-rose-700">{error}</p>}
+      {error && <p role="alert" className="mb-6 text-sm text-red-200">{error}</p>}
 
       <AdminRecipes />
     </Section>

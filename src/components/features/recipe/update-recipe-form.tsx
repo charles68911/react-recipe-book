@@ -78,7 +78,7 @@ export default function UpdateRecipeForm({ recipe, onSuccess }: UpdateRecipeForm
       </div>
 
       {error && <p role="alert" className="text-sm text-red-600 sm:col-span-2">{error}</p>}
-      <Button type="submit" className="w-full sm:col-span-2">
+      <Button type="submit" className="h-12 w-full font-semibold sm:col-span-2">
         Save Changes
       </Button>
     </form>

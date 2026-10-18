@@ -26,7 +26,7 @@ export function Input({ className, error, ...props }: InputProps) {
           focus:border-emerald-600
           focus:bg-white
           focus:ring-4
-          focus:ring-emerald-200
+          focus:ring-emerald-50
           `,
           error && "border-red-500",
           className
