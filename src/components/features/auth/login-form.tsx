@@ -2,8 +2,6 @@ import { useNavigate } from "react-router";
 import { useState, type SubmitEvent } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
-// i comment this part to make it responsive even there's no backend
-// import { useAuth } from "@/components/context/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +23,10 @@ function getErrorMessage(error: unknown) {
     }
   }
 
-  return "Could not connect to the API. Check that the API server is running.";
+  return "Could not connect to the API.";
 }
 
 export function LoginForm() {
-
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -40,171 +37,210 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-  //   event.preventDefault();
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  //   setError("");
-  //   setBusy(true);
+    setError("");
+    setBusy(true);
 
-  //   try {
-  //     const currentUser = await login(email, password);
+    const isAdmin =
+      email.trim().toLowerCase() === "admin@example.com";
 
-  //     navigate(currentUser.role === "ADMIN" ? "/admin" : "/user", {
-  //       replace: true,
-  //     });
-  //   } catch (requestError) {
-  //     setError(getErrorMessage(requestError));
-  //   } finally {
-  //     setBusy(false);
-  //   }
-  // }
+    const demoUser = {
+      id: isAdmin ? "demo-admin" : "demo-user",
+      name: isAdmin ? "Demo Admin" : "Demo User",
+      email: email.trim(),
+      role: isAdmin ? "ADMIN" : "USER",
+    };
 
-function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-  event.preventDefault();
+    sessionStorage.setItem("demoUser", JSON.stringify(demoUser));
 
-  setError("");
-  setBusy(true);
+    navigate(isAdmin ? "/admin" : "/user", {
+      replace: true,
+    });
 
-  // Temporary demo login without a backend
-  const isAdmin =
-    email.trim().toLowerCase() === "admin@example.com";
-
-  const demoUser = {
-    id: isAdmin ? "demo-admin" : "demo-user",
-    name: isAdmin ? "Demo Admin" : "Demo User",
-    email: email.trim(),
-    role: isAdmin ? "ADMIN" : "USER",
-  };
-
-  sessionStorage.setItem("demoUser", JSON.stringify(demoUser));
-
-  navigate(isAdmin ? "/admin" : "/user", { replace: true });
-
-  setBusy(false);
-}
+    setBusy(false);
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-8 space-y-7"
+    >
       {/* EMAIL */}
 
-      <div>
+      <div className="space-y-2">
         <Label
           htmlFor="auth-email"
-          className="mb-2 block text-sm font-medium text-slate-700"
+          className="text-sm font-semibold tracking-wide text-slate-700"
         >
-          Email
+          Email Address
         </Label>
 
-        <div className="relative">
-<Mail
-size={18}
-strokeWidth={2}
-className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-/>
+        <div className="group relative">
+          <Mail
+            size={18}
+            strokeWidth={2}
+            className="
+              absolute
+              left-4
+              top-1/2
+              -translate-y-1/2
+              text-slate-400
+              transition-colors
+              group-focus-within:text-emerald-600
+            "
+          />
 
           <Input
             id="auth-email"
             type="email"
             autoComplete="email"
             required
-            placeholder="Enter your email"
-            className="pl-11"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="
+              pl-11
+              h-14
+              rounded-2xl
+              transition-all
+            "
           />
         </div>
       </div>
 
       {/* PASSWORD */}
 
-      <div>
-        <div className="mb-2 flex items-center justify-between">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label
             htmlFor="auth-password"
-            className="text-sm font-medium text-slate-700"
+            className="text-sm font-semibold tracking-wide text-slate-700"
           >
             Password
           </Label>
 
           <button
             type="button"
-            className="text-sm text-emerald-700 hover:text-emerald-900"
+            className="
+              text-sm
+              font-medium
+              text-emerald-700
+              transition-colors
+              hover:text-emerald-900
+            "
           >
-            Forgot password?
+            Forgot Password?
           </button>
         </div>
 
-        <div className="relative">
-<Lock
-  size={18}
-  strokeWidth={2}
-  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-/>
+        <div className="group relative">
+          <Lock
+            size={18}
+            strokeWidth={2}
+            className="
+              absolute
+              left-4
+              top-1/2
+              -translate-y-1/2
+              text-slate-400
+              transition-colors
+              group-focus-within:text-emerald-600
+            "
+          />
 
           <Input
             id="auth-password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             required
-            minLength={1}
             placeholder="Enter your password"
-            className="pl-11 pr-12"
+            minLength={1}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="
+              pl-11
+              pr-12
+              h-14
+              rounded-2xl
+              transition-all
+            "
           />
 
-<button
-  type="button"
-  onClick={() => setShowPassword(!showPassword)}
-  className="
-    absolute
-    right-4
-    top-1/2
-    -translate-y-1/2
-    text-slate-400
-    transition-colors
-    hover:text-slate-700
-  "
->
-  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-</button>
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="
+              absolute
+              right-4
+              top-1/2
+              -translate-y-1/2
+              rounded-full
+              p-1
+              text-slate-400
+              transition-all
+              hover:bg-slate-100
+              hover:text-emerald-700
+            "
+          >
+            {showPassword ? (
+              <EyeOff size={18} />
+            ) : (
+              <Eye size={18} />
+            )}
+          </button>
         </div>
       </div>
 
-{error && (
-  <p
-    role="alert"
-    className="
-      rounded-xl
-      border
-      border-red-200
-      bg-red-50
-      px-4
-      py-3
-      text-sm
-      text-red-600
-    "
-  >
-    {error}
-  </p>
-)}
+      {/* ERROR */}
 
-<Button
-type="submit"
-disabled={busy}
-className="
-w-full
-h-12
-font-semibold
-shadow-lg
-transition-all
-duration-300
-hover:-translate-y-0.5
-hover:shadow-xl
-"
->
+      {error && (
+        <div
+          role="alert"
+          className="
+            rounded-2xl
+            border
+            border-red-200
+            bg-red-50
+            px-4
+            py-3
+            text-sm
+            font-medium
+            text-red-600
+          "
+        >
+          {error}
+        </div>
+      )}
+
+      {/* BUTTON */}
+
+      <Button
+        type="submit"
+        disabled={busy}
+        className="
+          h-14
+          w-full
+          rounded-2xl
+          bg-gradient-to-r
+          from-emerald-600
+          to-emerald-700
+          text-white
+          font-semibold
+          tracking-wide
+          shadow-lg
+          transition-all
+          duration-300
+          hover:-translate-y-1
+          hover:shadow-2xl
+          hover:from-emerald-700
+          hover:to-emerald-800
+          active:scale-[0.98]
+        "
+      >
         {busy ? "Signing in..." : "Continue"}
-      </Button>
+      </Button> 
     </form>
   );
 }
