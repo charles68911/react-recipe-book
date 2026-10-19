@@ -4,9 +4,97 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recipe Book</title>
+    <style>
+      /* Covers the first paint, while the JavaScript bundle is still downloading.
+         React replaces the contents of #root on mount, and the loader that takes
+         over is styled the same, so the hand off is invisible.
+         Colours mirror the Tailwind theme used by src/components/ui/loader.tsx. */
+      #boot-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        padding: 0 16px;
+        background: radial-gradient(ellipse at top, #245c4c, #102e28 65%);
+      }
+      .boot-loader-ring {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+      }
+      .boot-loader-ring::before,
+      .boot-loader-ring::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 2px solid transparent;
+        border-radius: 9999px;
+      }
+      .boot-loader-ring::before {
+        border-color: color-mix(in oklab, #fff 15%, transparent);
+      }
+      .boot-loader-ring::after {
+        border-top-color: oklch(76.5% 0.177 163.223);
+        border-right-color: oklch(76.5% 0.177 163.223);
+        animation: boot-loader-spin 1s linear infinite;
+      }
+      .boot-loader-ring svg {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        color: oklch(90.5% 0.093 164.15);
+      }
+      .boot-loader-label {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: color-mix(in oklab, oklch(95% 0.052 163.051) 70%, transparent);
+      }
+      @keyframes boot-loader-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-loader-ring::after {
+          animation-duration: 2.5s;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <div id="root">
+      <div id="boot-loader" role="status">
+        <div class="boot-loader-ring">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M2 12h20" />
+            <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+            <path d="m4 8 16-4" />
+            <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
+          </svg>
+        </div>
+        <p class="boot-loader-label">Loading</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
